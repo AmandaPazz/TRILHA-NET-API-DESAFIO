@@ -1,0 +1,928 @@
+@*
+    ====================================================================================
+    AVISO: Este frontend foi desenvolvido com auxílio de IA (Inteligência Artificial)
+    ====================================================================================
+    Este arquivo contém a interface web (frontend) para o Gerenciador de Tarefas.
+    Foi criado para facilitar o teste e uso da API REST desenvolvida no projeto.
+    
+    Estrutura:
+    - HTML: Estrutura da página
+    - CSS: Estilização e design responsivo
+    - JavaScript: Lógica para comunicação com a API e interatividade
+    ====================================================================================
+*@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    @* Meta tags para configuração básica da página *@
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Tarefas</title>
+    
+    @* ========== SEÇÃO CSS - ESTILIZAÇÃO DA PÁGINA ========== *@
+    <style>
+        @* Reset CSS: Remove margens e paddings padrão de todos os elementos *@
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box; /* Faz com que padding e border sejam incluídos na largura total */
+        }
+
+        @* Estilização do corpo da página *@
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fonte moderna e legível */
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); /* Gradiente vermelho (cor principal) */
+            min-height: 100vh; /* Garante que o body ocupe pelo menos toda a altura da tela */
+            padding: 20px; /* Espaçamento interno */
+        }
+
+        @* Container principal: centraliza e limita a largura do conteúdo *@
+        .container {
+            max-width: 1200px; /* Largura máxima para não ficar muito largo em telas grandes */
+            margin: 0 auto; /* Centraliza horizontalmente */
+            background: white; /* Fundo branco para contraste */
+            border-radius: 15px; /* Bordas arredondadas */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidade */
+            padding: 30px; /* Espaçamento interno */
+        }
+
+        @* Cabeçalho da página *@
+        .header {
+            text-align: center; /* Centraliza o conteúdo */
+            margin-bottom: 30px; /* Espaço abaixo do cabeçalho */
+        }
+
+        @* Estilização do ícone principal - tamanho reduzido proporcionalmente *@
+        .header img {
+            max-width: 60px; /* Largura máxima reduzida (era sem limite, agora 60px) */
+            max-height: 60px; /* Altura máxima reduzida proporcionalmente */
+            height: auto; /* Mantém proporção original */
+            width: auto; /* Mantém proporção original */
+            margin-bottom: 15px; /* Espaço abaixo do ícone */
+        }
+
+        @* Título principal *@
+        .header h1 {
+            color: #333; /* Cor do texto */
+            font-size: 2.5em; /* Tamanho da fonte */
+            margin-bottom: 10px; /* Espaço abaixo */
+        }
+
+        @* Subtítulo *@
+        .header p {
+            color: #666; /* Cor cinza para subtítulo */
+            font-size: 1.1em; /* Tamanho da fonte */
+        }
+
+        @* Seções da página (criar tarefa, buscar, lista) *@
+        .section {
+            margin-bottom: 30px; /* Espaço entre seções */
+            padding: 20px; /* Espaçamento interno */
+            background: #f8f9fa; /* Fundo cinza claro */
+            border-radius: 10px; /* Bordas arredondadas */
+        }
+
+        @* Títulos das seções *@
+        .section h2 {
+            color: #dc3545; /* Cor vermelha (tema principal) */
+            margin-bottom: 15px; /* Espaço abaixo */
+            font-size: 1.5em; /* Tamanho da fonte */
+        }
+
+        @* Grupos de campos do formulário *@
+        .form-group {
+            margin-bottom: 15px; /* Espaço entre campos */
+        }
+
+        @* Labels dos campos *@
+        label {
+            display: block; /* Faz o label ocupar toda a linha */
+            margin-bottom: 5px; /* Espaço abaixo do label */
+            color: #333; /* Cor do texto */
+            font-weight: 600; /* Texto em negrito */
+        }
+
+        @* Campos de entrada (input, select, textarea) *@
+        input,
+        select,
+        textarea {
+            width: 100%; /* Ocupa toda a largura disponível */
+            padding: 12px; /* Espaçamento interno */
+            border: 2px solid #ddd; /* Borda cinza */
+            border-radius: 8px; /* Bordas arredondadas */
+            font-size: 1em; /* Tamanho da fonte */
+            transition: border-color 0.3s; /* Animação suave na mudança de cor */
+        }
+
+        @* Quando o campo está focado (clicado) *@
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none; /* Remove a borda padrão do navegador */
+            border-color: #dc3545; /* Borda vermelha quando focado */
+        }
+
+        @* Estilização dos botões *@
+        button {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); /* Gradiente vermelho */
+            color: white; /* Texto branco */
+            border: none; /* Sem borda */
+            padding: 12px 30px; /* Espaçamento interno */
+            border-radius: 8px; /* Bordas arredondadas */
+            font-size: 1em; /* Tamanho da fonte */
+            cursor: pointer; /* Cursor de mão ao passar o mouse */
+            transition: transform 0.2s, box-shadow 0.2s; /* Animações suaves */
+            margin-right: 10px; /* Espaço à direita */
+            margin-top: 10px; /* Espaço acima */
+        }
+
+        @* Efeito ao passar o mouse sobre o botão *@
+        button:hover {
+            transform: translateY(-2px); /* Move o botão 2px para cima */
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4); /* Sombra vermelha */
+        }
+
+        @* Efeito ao clicar no botão *@
+        button:active {
+            transform: translateY(0); /* Volta à posição original */
+        }
+
+        @* Botão de perigo (deletar) *@
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); /* Gradiente vermelho mais escuro */
+        }
+
+        @* Botão de sucesso (criar) *@
+        .btn-success {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); /* Gradiente vermelho */
+        }
+
+        @* Botão secundário (buscar todas) *@
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); /* Gradiente cinza */
+        }
+
+        @* Grid para exibir as tarefas em cards *@
+        .tarefas-grid {
+            display: grid; /* Layout em grade */
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Colunas responsivas, mínimo 300px */
+            gap: 20px; /* Espaço entre os cards */
+            margin-top: 20px; /* Espaço acima */
+        }
+
+        @* Card individual de tarefa *@
+        .tarefa-card {
+            background: white; /* Fundo branco */
+            border: 2px solid #e0e0e0; /* Borda cinza clara */
+            border-radius: 10px; /* Bordas arredondadas */
+            padding: 20px; /* Espaçamento interno */
+            transition: transform 0.2s, box-shadow 0.2s; /* Animações suaves */
+        }
+
+        @* Efeito ao passar o mouse sobre o card *@
+        .tarefa-card:hover {
+            transform: translateY(-5px); /* Move o card 5px para cima */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1); /* Sombra mais pronunciada */
+        }
+
+        @* Título da tarefa no card *@
+        .tarefa-card h3 {
+            color: #dc3545; /* Cor vermelha */
+            margin-bottom: 10px; /* Espaço abaixo */
+        }
+
+        @* Texto do card *@
+        .tarefa-card p {
+            color: #666; /* Cor cinza */
+            margin-bottom: 8px; /* Espaço abaixo */
+        }
+
+        @* Badge de status da tarefa *@
+        .status {
+            display: inline-block; /* Permite definir largura e altura */
+            padding: 5px 15px; /* Espaçamento interno */
+            border-radius: 20px; /* Bordas muito arredondadas (formato pill) */
+            font-size: 0.9em; /* Tamanho da fonte menor */
+            font-weight: 600; /* Texto em negrito */
+            margin-top: 10px; /* Espaço acima */
+        }
+
+        @* Status Pendente - amarelo *@
+        .status-pendente {
+            background: #fff3cd; /* Fundo amarelo claro */
+            color: #856404; /* Texto amarelo escuro */
+        }
+
+        @* Status Finalizado - verde *@
+        .status-finalizado {
+            background: #d4edda; /* Fundo verde claro */
+            color: #155724; /* Texto verde escuro */
+        }
+
+        @* Container de mensagens (sucesso/erro) *@
+        .message {
+            padding: 15px; /* Espaçamento interno */
+            border-radius: 8px; /* Bordas arredondadas */
+            margin-bottom: 20px; /* Espaço abaixo */
+            font-weight: 600; /* Texto em negrito */
+        }
+
+        @* Mensagem de sucesso *@
+        .message-success {
+            background: #d4edda; /* Fundo verde claro */
+            color: #155724; /* Texto verde escuro */
+            border: 2px solid #c3e6cb; /* Borda verde */
+        }
+
+        @* Mensagem de erro *@
+        .message-error {
+            background: #f8d7da; /* Fundo vermelho claro */
+            color: #721c24; /* Texto vermelho escuro */
+            border: 2px solid #f5c6cb; /* Borda vermelha */
+        }
+
+        @* Container dos botões de ação (editar/deletar) no card *@
+        .actions {
+            margin-top: 15px; /* Espaço acima */
+            display: flex; /* Layout flexível */
+            gap: 10px; /* Espaço entre botões */
+        }
+
+        @* Botões dentro do container de ações *@
+        .actions button {
+            flex: 1; /* Cada botão ocupa espaço igual */
+            margin: 0; /* Remove margens padrão */
+            padding: 8px; /* Espaçamento interno menor */
+            font-size: 0.9em; /* Tamanho da fonte menor */
+        }
+
+        @* Item individual de busca (cada tipo de busca tem seu card) *@
+        .busca-item {
+            background: white; /* Fundo branco */
+            padding: 15px; /* Espaçamento interno */
+            border-radius: 8px; /* Bordas arredondadas */
+            margin-bottom: 15px; /* Espaço abaixo */
+            border: 2px solid #e0e0e0; /* Borda cinza clara */
+        }
+
+        @* Título de cada item de busca *@
+        .busca-item h3 {
+            color: #dc3545; /* Cor vermelha */
+            font-size: 1.1em; /* Tamanho da fonte */
+            margin-bottom: 10px; /* Espaço abaixo */
+        }
+
+        @* Container flexível para campo de busca e botão *@
+        .busca-item .busca-content {
+            display: flex; /* Layout flexível */
+            gap: 10px; /* Espaço entre elementos */
+            align-items: flex-end; /* Alinha elementos na parte inferior */
+        }
+
+        @* Campos de entrada dentro dos itens de busca *@
+        .busca-item input,
+        .busca-item select {
+            flex: 1; /* Ocupa espaço disponível */
+            margin: 0; /* Remove margens */
+        }
+
+        @* Botão dentro dos itens de busca *@
+        .busca-item button {
+            margin: 0; /* Remove margens */
+            white-space: nowrap; /* Impede quebra de linha no texto do botão */
+        }
+
+        @* ========== ESTILOS DO MODAL DE EDIÇÃO ========== *@
+        @* Overlay (fundo escuro) que cobre toda a tela quando o modal está aberto *@
+        .modal-overlay {
+            display: none; /* Inicialmente oculto */
+            position: fixed; /* Fixo na tela */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Fundo preto semi-transparente */
+            z-index: 1000; /* Fica acima de outros elementos */
+            justify-content: center;
+            align-items: center;
+        }
+
+        @* Quando o modal está ativo, mostra o overlay *@
+        .modal-overlay.active {
+            display: flex; /* Mostra o modal */
+        }
+
+        @* Container do modal *@
+        .modal {
+            background: white; /* Fundo branco */
+            border-radius: 15px; /* Bordas arredondadas */
+            padding: 30px; /* Espaçamento interno */
+            max-width: 500px; /* Largura máxima */
+            width: 90%; /* Largura responsiva */
+            max-height: 90vh; /* Altura máxima */
+            overflow-y: auto; /* Permite rolagem se o conteúdo for muito grande */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); /* Sombra pronunciada */
+            position: relative; /* Para posicionar o botão de fechar */
+        }
+
+        @* Cabeçalho do modal *@
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+
+        @* Título do modal *@
+        .modal-header h2 {
+            color: #dc3545; /* Cor vermelha (tema) */
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        @* Botão de fechar o modal *@
+        .modal-close {
+            background: #dc3545; /* Fundo vermelho */
+            color: white; /* Texto branco */
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%; /* Formato circular */
+            cursor: pointer;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        @* Efeito hover no botão de fechar *@
+        .modal-close:hover {
+            background: #c82333; /* Vermelho mais escuro */
+        }
+
+        @* Corpo do modal (onde fica o formulário) *@
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        @* Rodapé do modal (onde ficam os botões de ação) *@
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 2px solid #e0e0e0;
+            padding-top: 15px;
+        }
+
+        @* Botão secundário no modal (cancelar) *@
+        .modal-footer .btn-cancel {
+            background: #6c757d; /* Cinza */
+            color: white;
+        }
+
+        @* Botão primário no modal (salvar) *@
+        .modal-footer .btn-save {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); /* Gradiente vermelho */
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    @* ========== SEÇÃO HTML - ESTRUTURA DA PÁGINA ========== *@
+    
+    @* Container principal que envolve todo o conteúdo *@
+    <div class="container">
+        @* Cabeçalho com ícone, título e subtítulo *@
+        <div class="header">
+            @* Ícone principal - caminho relativo à pasta Resources configurada no Program.cs *@
+            <img src="/Resources/icon.png" alt="Ícone" onerror="this.style.display='none'">
+            <h1>Gerenciador de Tarefas</h1>
+            <p>Gerencie suas tarefas de forma simples e eficiente</p>
+        </div>
+
+        @* Div para exibir mensagens de sucesso/erro (preenchida via JavaScript) *@
+        <div id="message"></div>
+
+        @* ========== SEÇÃO: CRIAR NOVA TAREFA ========== *@
+        <div class="section">
+            <h2>+ Criar Nova Tarefa</h2>
+            @* Formulário para criar nova tarefa *@
+            <form id="formCriar">
+                <div class="form-group">
+                    <label>Título:</label>
+                    <input type="text" id="titulo" required> @* Campo obrigatório *@
+                </div>
+                <div class="form-group">
+                    <label>Descrição:</label>
+                    <textarea id="descricao" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Data (pode ser apenas a data ou data com hora):</label>
+                    <input type="datetime-local" id="data" required placeholder="DD/MM/AAAA ou DD/MM/AAAA HH:MM"> @* Campo obrigatório - aceita apenas data ou data com hora *@
+                    <small style="color: #666; font-size: 0.9em; display: block; margin-top: 5px;">Você pode inserir apenas a data ou a data com hora</small>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="status">
+                        <option value="Pendente">Pendente</option>
+                        <option value="Finalizado">Finalizado</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-success">Criar Tarefa</button>
+            </form>
+        </div>
+
+        @* ========== SEÇÃO: BUSCAR TAREFAS ========== *@
+        <div class="section">
+            <h2>🔍 Buscar Tarefas</h2>
+
+            @* Buscar Todas as Tarefas - não precisa de campo de entrada *@
+            <div class="busca-item">
+                <h3> Obter Todas as Tarefas</h3>
+                <button onclick="obterTodos()" class="btn-secondary">Buscar Todas</button>
+            </div>
+
+            @* Buscar por ID - precisa de um número *@
+            <div class="busca-item">
+                <h3> Buscar por ID</h3>
+                <div class="busca-content">
+                    <input type="number" id="buscarId" placeholder="Digite o ID da tarefa" min="1">
+                    <button onclick="obterPorId()">Buscar</button>
+                </div>
+            </div>
+
+            @* Buscar por Título - busca parcial no título *@
+            <div class="busca-item">
+                <h3> Buscar por Título</h3>
+                <div class="busca-content">
+                    <input type="text" id="buscarTitulo" placeholder="Digite o título da tarefa">
+                    <button onclick="obterPorTitulo()">Buscar</button>
+                </div>
+            </div>
+
+            @* Buscar por Data - busca tarefas de uma data específica *@
+            <div class="busca-item">
+                <h3> Buscar por Data</h3>
+                <div class="busca-content">
+                    <input type="date" id="buscarData">
+                    <button onclick="obterPorData()">Buscar</button>
+                </div>
+            </div>
+
+            @* Buscar por Status - busca tarefas com status específico *@
+            <div class="busca-item">
+                <h3> Buscar por Status</h3>
+                <div class="busca-content">
+                    <select id="buscarStatus">
+                        <option value="">Selecione o status</option>
+                        <option value="Pendente">Pendente</option>
+                        <option value="Finalizado">Finalizado</option>
+                    </select>
+                    <button onclick="obterPorStatus()">Buscar</button>
+                </div>
+            </div>
+        </div>
+
+        @* ========== SEÇÃO: LISTA DE TAREFAS ========== *@
+        <div class="section">
+            <h2>📝 Lista de Tarefas</h2>
+            @* Container onde as tarefas serão renderizadas dinamicamente via JavaScript *@
+            <div id="tarefas" class="tarefas-grid"></div>
+        </div>
+    </div>
+
+    @* ========== MODAL DE EDIÇÃO DE TAREFA ========== *@
+    @* Overlay (fundo escuro) que aparece quando o modal está aberto *@
+    <div id="modalEditar" class="modal-overlay">
+        <div class="modal">
+            @* Cabeçalho do modal com título e botão de fechar *@
+            <div class="modal-header">
+                <h2>Editar Tarefa</h2>
+                <button class="modal-close" onclick="fecharModal()">&times;</button>
+            </div>
+            
+            @* Corpo do modal com o formulário de edição *@
+            <div class="modal-body">
+                <form id="formEditar">
+                    @* Campo ID (somente leitura para referência) *@
+                    <div class="form-group">
+                        <label>ID:</label>
+                        <input type="text" id="editarId" readonly style="background: #f0f0f0; cursor: not-allowed;">
+                    </div>
+                    
+                    @* Campo Título *@
+                    <div class="form-group">
+                        <label>Título:</label>
+                        <input type="text" id="editarTitulo" required>
+                    </div>
+                    
+                    @* Campo Descrição *@
+                    <div class="form-group">
+                        <label>Descrição:</label>
+                        <textarea id="editarDescricao" rows="3"></textarea>
+                    </div>
+                    
+                    @* Campo Data (aceita apenas data ou data com hora) *@
+                    <div class="form-group">
+                        <label>Data (pode ser apenas a data ou data com hora):</label>
+                        <input type="datetime-local" id="editarData" required>
+                        <small style="color: #666; font-size: 0.9em; display: block; margin-top: 5px;">Você pode inserir apenas a data ou a data com hora</small>
+                    </div>
+                    
+                    @* Campo Status *@
+                    <div class="form-group">
+                        <label>Status:</label>
+                        <select id="editarStatus">
+                            <option value="Pendente">Pendente</option>
+                            <option value="Finalizado">Finalizado</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            
+            @* Rodapé do modal com botões de ação *@
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+                <button class="btn-save" onclick="salvarEdicao()">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    @* ========== SEÇÃO JAVASCRIPT - LÓGICA E INTERATIVIDADE ========== *@
+    <script>
+        @* Define a URL base da API (mesma origem da página) *@
+        const API_BASE = window.location.origin;
+
+        @* Função para exibir mensagens de sucesso ou erro *@
+        function showMessage(text, isError = false) {
+            const messageDiv = document.getElementById('message');
+            @* Define a classe CSS baseado no tipo de mensagem *@
+            messageDiv.className = `message ${isError ? 'message-error' : 'message-success'}`;
+            messageDiv.textContent = text; @* Define o texto da mensagem *@
+            messageDiv.style.display = 'block'; @* Torna a mensagem visível *@
+            @* Remove a mensagem automaticamente após 3 segundos *@
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        @* Função para formatar data no padrão brasileiro *@
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleString('pt-BR'); @* Formato: DD/MM/AAAA HH:MM:SS *@
+        }
+
+        @* Função para renderizar as tarefas na tela *@
+        function renderTarefas(tarefas) {
+            const container = document.getElementById('tarefas');
+            @* Se não houver tarefas, exibe mensagem *@
+            if (!tarefas || tarefas.length === 0) {
+                container.innerHTML = '<p>Nenhuma tarefa encontrada.</p>';
+                return;
+            }
+
+            @* Garante que tarefas seja um array (pode vir um objeto único) *@
+            const tarefasArray = Array.isArray(tarefas) ? tarefas : [tarefas];
+            
+            @* Cria HTML para cada tarefa usando template string e map *@
+            container.innerHTML = tarefasArray.map(tarefa => `
+                <div class="tarefa-card">
+                    <h3>${tarefa.titulo || 'Sem título'}</h3>
+                    <p><strong>ID:</strong> ${tarefa.id}</p>
+                    <p><strong>Descrição:</strong> ${tarefa.descricao || 'Sem descrição'}</p>
+                    <p><strong>Data:</strong> ${formatDate(tarefa.data)}</p>
+                    <span class="status status-${tarefa.status?.toLowerCase() || 'pendente'}">
+                        ${tarefa.status || 'Pendente'}
+                    </span>
+                    <div class="actions">
+                        <button onclick="editarTarefa(${tarefa.id})" style="background: #ffc107; color: #000;">Editar</button>
+                        <button onclick="deletarTarefa(${tarefa.id})" class="btn-danger">Deletar</button>
+                    </div>
+                </div>
+            `).join(''); @* Junta todos os cards em uma única string HTML *@
+        }
+
+        @* ========== FUNÇÃO AUXILIAR: PROCESSAR DATA ========== *@
+        @* Função que aceita tanto data simples quanto data com hora *@
+        function processarData(valorData) {
+            if (!valorData) return null;
+            
+            @* Se o valor já contém hora (formato datetime-local: YYYY-MM-DDTHH:MM) *@
+            if (valorData.includes('T') && valorData.length > 10) {
+                return new Date(valorData).toISOString();
+            }
+            
+            @* Se for apenas data (formato date: YYYY-MM-DD), adiciona meia-noite como hora padrão *@
+            if (valorData.length === 10) {
+                return new Date(valorData + 'T00:00:00').toISOString();
+            }
+            
+            @* Tenta converter diretamente *@
+            return new Date(valorData).toISOString();
+        }
+
+        @* ========== EVENT LISTENER: CRIAR TAREFA ========== *@
+        @* Adiciona listener ao formulário para interceptar o submit *@
+        document.getElementById('formCriar').addEventListener('submit', async (e) => {
+            e.preventDefault(); @* Previne o comportamento padrão (recarregar página) *@
+            
+            @* Obtém o valor do campo de data *@
+            const valorData = document.getElementById('data').value;
+            
+            @* Processa a data (aceita apenas data ou data com hora) *@
+            const dataProcessada = processarData(valorData);
+            
+            if (!dataProcessada) {
+                showMessage('Por favor, insira uma data válida.', true);
+                return;
+            }
+            
+            @* Cria objeto tarefa com os valores dos campos *@
+            const tarefa = {
+                titulo: document.getElementById('titulo').value,
+                descricao: document.getElementById('descricao').value,
+                data: dataProcessada, @* Usa a data processada (aceita apenas data ou data com hora) *@
+                status: document.getElementById('status').value
+            };
+
+            try {
+                @* Faz requisição POST para criar a tarefa *@
+                const response = await fetch(`${API_BASE}/Tarefa`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }, @* Define que está enviando JSON *@
+                    body: JSON.stringify(tarefa) @* Converte objeto para JSON *@
+                });
+
+                if (response.ok) {
+                    showMessage('Tarefa criada com sucesso!');
+                    document.getElementById('formCriar').reset(); @* Limpa o formulário *@
+                    obterTodos(); @* Recarrega a lista de tarefas *@
+                } else {
+                    showMessage('Erro ao criar tarefa.', true);
+                }
+            } catch (error) {
+                showMessage('Erro ao criar tarefa: ' + error.message, true);
+            }
+        });
+
+        @* ========== FUNÇÃO: OBTER TODAS AS TAREFAS ========== *@
+        async function obterTodos() {
+            try {
+                @* Faz requisição GET para obter todas as tarefas *@
+                const response = await fetch(`${API_BASE}/Tarefa/ObterTodos`);
+                const data = await response.json(); @* Converte resposta JSON para objeto JavaScript *@
+                renderTarefas(data); @* Renderiza as tarefas na tela *@
+                showMessage('Tarefas carregadas!');
+            } catch (error) {
+                showMessage('Erro ao buscar tarefas: ' + error.message, true);
+            }
+        }
+
+        @* ========== FUNÇÃO: OBTER TAREFA POR ID ========== *@
+        async function obterPorId() {
+            const id = document.getElementById('buscarId').value;
+            if (!id) {
+                showMessage('Digite um ID', true);
+                return;
+            }
+            try {
+                @* Faz requisição GET para obter tarefa específica por ID *@
+                const response = await fetch(`${API_BASE}/Tarefa/${id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    renderTarefas([data]); @* Passa como array para a função renderizar *@
+                    showMessage('Tarefa encontrada!');
+                } else {
+                    showMessage('Tarefa não encontrada.', true);
+                }
+            } catch (error) {
+                showMessage('Erro ao buscar tarefa: ' + error.message, true);
+            }
+        }
+
+        @* ========== FUNÇÃO: OBTER TAREFAS POR TÍTULO ========== *@
+        async function obterPorTitulo() {
+            const titulo = document.getElementById('buscarTitulo').value;
+            if (!titulo) {
+                showMessage('Digite um título', true);
+                return;
+            }
+            try {
+                @* Faz requisição GET com parâmetro de query string *@
+                @* encodeURIComponent garante que caracteres especiais sejam codificados corretamente *@
+                const response = await fetch(`${API_BASE}/Tarefa/ObterPorTitulo?titulo=${encodeURIComponent(titulo)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    renderTarefas(data);
+                    showMessage('Tarefas encontradas!');
+                } else {
+                    showMessage('Nenhuma tarefa encontrada.', true);
+                }
+            } catch (error) {
+                showMessage('Erro ao buscar tarefas: ' + error.message, true);
+            }
+        }
+
+        @* ========== FUNÇÃO: OBTER TAREFAS POR DATA ========== *@
+        async function obterPorData() {
+            const data = document.getElementById('buscarData').value;
+            if (!data) {
+                showMessage('Selecione uma data', true);
+                return;
+            }
+            try {
+                @* Adiciona horário 00:00:00 à data para busca completa do dia *@
+                const response = await fetch(`${API_BASE}/Tarefa/ObterPorData?data=${data}T00:00:00`);
+                if (response.ok) {
+                    const data = await response.json();
+                    renderTarefas(data);
+                    showMessage('Tarefas encontradas!');
+                } else {
+                    showMessage('Nenhuma tarefa encontrada.', true);
+                }
+            } catch (error) {
+                showMessage('Erro ao buscar tarefas: ' + error.message, true);
+            }
+        }
+
+        @* ========== FUNÇÃO: OBTER TAREFAS POR STATUS ========== *@
+        async function obterPorStatus() {
+            const status = document.getElementById('buscarStatus').value;
+            if (!status) {
+                showMessage('Selecione um status', true);
+                return;
+            }
+            try {
+                @* Faz requisição GET com parâmetro de query string para status *@
+                const response = await fetch(`${API_BASE}/Tarefa/ObterPorStatus?status=${status}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    renderTarefas(data);
+                    showMessage('Tarefas encontradas!');
+                } else {
+                    showMessage('Nenhuma tarefa encontrada.', true);
+                }
+            } catch (error) {
+                showMessage('Erro ao buscar tarefas: ' + error.message, true);
+            }
+        }
+
+        @* ========== FUNÇÃO: ABRIR MODAL DE EDIÇÃO ========== *@
+        @* Variável global para armazenar o ID da tarefa sendo editada *@
+        let tarefaIdEditando = null;
+
+        @* Função para abrir o modal e carregar os dados da tarefa *@
+        async function editarTarefa(id) {
+            try {
+                @* Busca a tarefa no servidor *@
+                const response = await fetch(`${API_BASE}/Tarefa/${id}`);
+                if (response.ok) {
+                    const tarefa = await response.json();
+                    
+                    @* Armazena o ID da tarefa sendo editada *@
+                    tarefaIdEditando = tarefa.id;
+                    
+                    @* Preenche os campos do formulário do modal com os dados da tarefa *@
+                    document.getElementById('editarId').value = tarefa.id;
+                    document.getElementById('editarTitulo').value = tarefa.titulo || '';
+                    document.getElementById('editarDescricao').value = tarefa.descricao || '';
+                    
+                    @* Converte data para formato datetime-local (YYYY-MM-DDTHH:MM) *@
+                    const data = new Date(tarefa.data);
+                    document.getElementById('editarData').value = data.toISOString().slice(0, 16);
+                    document.getElementById('editarStatus').value = tarefa.status || 'Pendente';
+                    
+                    @* Abre o modal *@
+                    abrirModal();
+                } else {
+                    showMessage('Tarefa não encontrada.', true);
+                }
+            } catch (error) {
+                showMessage('Erro ao carregar tarefa: ' + error.message, true);
+            }
+        }
+
+        @* ========== FUNÇÃO: ABRIR MODAL ========== *@
+        function abrirModal() {
+            const modal = document.getElementById('modalEditar');
+            modal.classList.add('active'); @* Adiciona classe 'active' para mostrar o modal *@
+        }
+
+        @* ========== FUNÇÃO: FECHAR MODAL ========== *@
+        function fecharModal() {
+            const modal = document.getElementById('modalEditar');
+            modal.classList.remove('active'); @* Remove classe 'active' para ocultar o modal *@
+            tarefaIdEditando = null; @* Limpa o ID da tarefa sendo editada *@
+            document.getElementById('formEditar').reset(); @* Limpa o formulário *@
+        }
+
+        @* ========== FUNÇÃO: SALVAR EDIÇÃO ========== *@
+        async function salvarEdicao() {
+            @* Valida se há uma tarefa sendo editada *@
+            if (!tarefaIdEditando) {
+                showMessage('Erro: ID da tarefa não encontrado.', true);
+                return;
+            }
+
+            @* Obtém e valida os valores do formulário *@
+            const titulo = document.getElementById('editarTitulo').value.trim();
+            if (!titulo) {
+                showMessage('Por favor, preencha o título.', true);
+                return;
+            }
+
+            @* Obtém e processa a data (aceita apenas data ou data com hora) *@
+            const valorData = document.getElementById('editarData').value;
+            const dataProcessada = processarData(valorData);
+            
+            if (!dataProcessada) {
+                showMessage('Por favor, insira uma data válida.', true);
+                return;
+            }
+
+            @* Cria objeto com os dados atualizados *@
+            const tarefaAtualizada = {
+                titulo: titulo,
+                descricao: document.getElementById('editarDescricao').value,
+                data: dataProcessada, @* Usa a data processada (aceita apenas data ou data com hora) *@
+                status: document.getElementById('editarStatus').value
+            };
+
+            try {
+                @* Faz requisição PUT para atualizar a tarefa *@
+                const response = await fetch(`${API_BASE}/Tarefa/${tarefaIdEditando}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(tarefaAtualizada)
+                });
+
+                if (response.ok) {
+                    showMessage('Tarefa atualizada com sucesso!');
+                    fecharModal(); @* Fecha o modal após salvar *@
+                    obterTodos(); @* Recarrega a lista de tarefas *@
+                } else {
+                    showMessage('Erro ao atualizar tarefa.', true);
+                }
+            } catch (error) {
+                showMessage('Erro ao atualizar tarefa: ' + error.message, true);
+            }
+        }
+
+        @* ========== FECHAR MODAL AO CLICAR FORA ========== *@
+        @* Fecha o modal quando o usuário clica no overlay (fundo escuro) *@
+        document.getElementById('modalEditar').addEventListener('click', function(e) {
+            @* Se o clique foi diretamente no overlay (não no modal em si) *@
+            if (e.target === this) {
+                fecharModal();
+            }
+        });
+
+        @* ========== FECHAR MODAL COM TECLA ESC ========== *@
+        @* Fecha o modal quando o usuário pressiona a tecla ESC *@
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('modalEditar');
+                if (modal.classList.contains('active')) {
+                    fecharModal();
+                }
+            }
+        });
+
+        @* ========== FUNÇÃO: DELETAR TAREFA ========== *@
+        async function deletarTarefa(id) {
+            @* Solicita confirmação antes de deletar *@
+            if (!confirm('Tem certeza que deseja deletar esta tarefa?')) return;
+
+            try {
+                @* Faz requisição DELETE para remover a tarefa *@
+                const response = await fetch(`${API_BASE}/Tarefa/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showMessage('Tarefa deletada com sucesso!');
+                    obterTodos(); @* Recarrega a lista *@
+                } else {
+                    showMessage('Erro ao deletar tarefa.', true);
+                }
+            } catch (error) {
+                showMessage('Erro ao deletar tarefa: ' + error.message, true);
+            }
+        }
+
+        @* ========== INICIALIZAÇÃO: CARREGAR TAREFAS AO ABRIR A PÁGINA ========== *@
+        @* Quando a página termina de carregar, busca todas as tarefas automaticamente *@
+        window.onload = () => {
+            obterTodos();
+        };
+    </script>
+</body>
+
+</html>
