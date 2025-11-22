@@ -20,6 +20,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciador de Tarefas</title>
+    @* Favicon (ícone da aba do navegador) *@
+    <link rel="icon" type="image/png" href="/Resources/icon.png">
     
     @* ========== SEÇÃO CSS - ESTILIZAÇÃO DA PÁGINA ========== *@
     <style>
@@ -54,13 +56,15 @@
             margin-bottom: 30px; /* Espaço abaixo do cabeçalho */
         }
 
-        @* Estilização do ícone principal - tamanho reduzido proporcionalmente *@
+        @* Estilização do ícone principal - mantém proporção original *@
         .header img {
-            max-width: 60px; /* Largura máxima reduzida (era sem limite, agora 60px) */
-            max-height: 60px; /* Altura máxima reduzida proporcionalmente */
-            height: auto; /* Mantém proporção original */
-            width: auto; /* Mantém proporção original */
+            height: 50px; /* Altura fixa de 50px */
+            width: auto; /* Largura automática - mantém proporção original do ícone */
+            object-fit: contain; /* Mantém proporção original sem distorção */
             margin-bottom: 15px; /* Espaço abaixo do ícone */
+            display: block; /* Garante que o ícone seja exibido */
+            margin-left: auto; /* Centraliza horizontalmente */
+            margin-right: auto; /* Centraliza horizontalmente */
         }
 
         @* Título principal *@
@@ -349,8 +353,8 @@
             background: #dc3545; /* Fundo vermelho */
             color: white; /* Texto branco */
             border: none;
-            width: 35px;
-            height: 35px;
+            width: 35px; /* Largura fixa */
+            height: 35px; /* Altura fixa igual à largura (círculo perfeito) */
             border-radius: 50%; /* Formato circular */
             cursor: pointer;
             font-size: 1.5em;
@@ -358,6 +362,10 @@
             align-items: center;
             justify-content: center;
             transition: background 0.3s;
+            padding: 0; /* Remove qualquer padding que possa distorcer o círculo */
+            margin: 0; /* Remove margens */
+            line-height: 1; /* Garante que o texto fique centralizado */
+            flex-shrink: 0; /* Impede que o botão encolha */
         }
 
         @* Efeito hover no botão de fechar *@
@@ -400,8 +408,9 @@
     <div class="container">
         @* Cabeçalho com ícone, título e subtítulo *@
         <div class="header">
-            @* Ícone principal - caminho relativo à pasta Resources configurada no Program.cs *@
-            <img src="/Resources/icon.png" alt="Ícone" onerror="this.style.display='none'">
+            @* Ícone principal - tenta múltiplos caminhos para garantir que funcione *@
+            <img src="/Resources/icon.png" alt="Ícone" 
+                 onerror="this.onerror=null; this.src='/icon.png';">
             <h1>Gerenciador de Tarefas</h1>
             <p>Gerencie suas tarefas de forma simples e eficiente</p>
         </div>
